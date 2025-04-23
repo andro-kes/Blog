@@ -1,4 +1,4 @@
-module Blog
+module github.com/andro-kes/Blog
 
 go 1.24.2
 

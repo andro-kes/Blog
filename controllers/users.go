@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"Blog/models"
-
 	"github.com/andro-kes/Blog/models"
 	"github.com/gin-gonic/gin"
 )
@@ -20,5 +18,5 @@ func LoginHandler(c *gin.Context) {
 
 	var existingUser models.Users
 	DB.Where("email = ?", user.Email).First(&existingUser)
-	
+
 }
