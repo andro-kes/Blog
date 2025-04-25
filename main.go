@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github/andro-kes/Blog/controllers"
-	"github/andro-kes/Blog/middlewares"
+	"github.com/andro-kes/Blog/controllers"
+	"github.com/andro-kes/Blog/middlewares"
 )
 
 func main() {
 	router := gin.Default()
-	router.Use(middlewares.DBMiddleWare)
+	router.Use(middlewares.DBMiddleWare())
 
 	usersRouter := router.Group("/users")
 	usersRouter.POST("/login", controllers.LoginHandler)

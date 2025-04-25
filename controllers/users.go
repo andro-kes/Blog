@@ -9,22 +9,30 @@ import (
 	"gorm.io/gorm"
 )
 
-func LoginHandler(c *gin.Context) {
+func connectDB(c *gin.Context) *gorm.DB {
 	dbValue, ok := c.Get("DB")
 	if ok != false {
 		c.JSON(400, gin.H{"error": "База данных не найдена"})
-		return
+		return nil
 	}
 
 	DB, ok := dbValue.(*gorm.DB)
 	if ok != false {
 		c.JSON(400, gin.H{"error": "Не удалось подключиться к базе данных"})
+		return nil
+	}
+	return DB
+}
+
+func LoginHandler(c *gin.Context) {
+	DB := connectDB(c)
+	if DB == nil {
 		return
 	}
 
 	var user models.Users
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"error": "Ошбика при связывании с моделью Users"})
+		c.JSON(400, gin.H{"error": "Ошибка при связывании с моделью Users"})
 		return
 	}
 
@@ -62,4 +70,34 @@ func LoginHandler(c *gin.Context) {
 
 	c.SetCookie("token", tokenString, int(expititionTime.Unix()), "/", "localhost", false, true)
 	c.JSON(200, gin.H{"message": "Пользователь авторизован"})
+}
+
+func SignupHandler(c *gin.Context) {
+	DB := connectDB(c)
+	if DB == nil {
+		return
+	}
+
+	var user models.Users
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(400, gin.H{"error": "Ошибка при связывании с моделью Users"})
+		return
+	}
+
+	var existingUser models.Users
+	DB.Where("email = ?", user.Email).First(&existingUser)
+	if existingUser.ID != 0 {
+		c.JSON(400, gin.H{"error": "Пользователь с такими данными уже существует"})
+		return
+	}
+
+	hashPassword, err := utils.GenerateHashPassword(existingUser.Password)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Не удалось получить хэш пароля"})
+		return
+	}
+	existingUser.Password = string(hashPassword)
+
+	DB.Create(&existingUser)
+	c.JSON(300, gin.H{"message": "Пользователь успешно зарегистрирован"})
 }
