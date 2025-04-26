@@ -5,10 +5,13 @@ import (
 
 	"github.com/andro-kes/Blog/controllers"
 	"github.com/andro-kes/Blog/middlewares"
+	"github.com/andro-kes/Blog/config"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	config.LoadConfig()
+	
 	router := gin.Default()
 	router.Use(middlewares.DBMiddleWare())
 

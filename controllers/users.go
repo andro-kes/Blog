@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/andro-kes/Blog/config"
 	"github.com/andro-kes/Blog/models"
 	"github.com/andro-kes/Blog/utils"
 	"github.com/dgrijalva/jwt-go"
@@ -57,7 +58,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SigningString()
+	tokenString, err := token.SignedString([]byte(config.SECRET_KEY))
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Не удалось создать токен"})
 		return

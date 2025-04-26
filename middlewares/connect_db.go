@@ -1,14 +1,13 @@
 package middlewares
 
 import (
-	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/andro-kes/Blog/models"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	"github.com/andro-kes/Blog/config"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,23 +15,8 @@ import (
 var DB *gorm.DB 
 
 func init() { 
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Ошибка загрузки файла .env: %v", err) 
-		return
-	}
-
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		os.Getenv("HOST"),
-		"postgres", // TODO: Перенести в .env
-		os.Getenv("PASSWORD"),
-		os.Getenv("DBNAME"),
-		os.Getenv("PORT"),
-		os.Getenv("SSLMODE"),
-	)
-
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	var err error
+	DB, err = gorm.Open(postgres.Open(config.DSN), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Ошибка подключения к базе данных: %v", err) 
 		return
