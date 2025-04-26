@@ -1,32 +1,26 @@
 package controllers
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/andro-kes/Blog/models"
 	"github.com/andro-kes/Blog/utils"
 	"github.com/dgrijalva/jwt-go"
-	"time"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func connectDB(c *gin.Context) *gorm.DB {
+func LoginHandler(c *gin.Context) {
 	dbValue, ok := c.Get("DB")
-	if ok != false {
+	if ok == false {
 		c.JSON(400, gin.H{"error": "База данных не найдена"})
-		return nil
+		return
 	}
 
 	DB, ok := dbValue.(*gorm.DB)
-	if ok != false {
+	if ok == false {
 		c.JSON(400, gin.H{"error": "Не удалось подключиться к базе данных"})
-		return nil
-	}
-	return DB
-}
-
-func LoginHandler(c *gin.Context) {
-	DB := connectDB(c)
-	if DB == nil {
 		return
 	}
 
@@ -47,6 +41,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(user.Password, existingUser.Password)
 	if err := utils.CompareHashPasswords(user.Password, existingUser.Password); err != nil {
 		c.JSON(400, gin.H{"error": "Неверный пароль"})
 		return
@@ -73,8 +68,14 @@ func LoginHandler(c *gin.Context) {
 }
 
 func SignupHandler(c *gin.Context) {
-	DB := connectDB(c)
-	if DB == nil {
+	dbValue, ok := c.Get("DB")
+	if ok == false {
+		c.JSON(400, gin.H{"error": "База данных не найдена"})
+		return
+	}
+	DB, ok := dbValue.(*gorm.DB)
+	if ok == false {
+		c.JSON(400, gin.H{"error": "Не удалось подключиться к базе данных"})
 		return
 	}
 
@@ -91,14 +92,14 @@ func SignupHandler(c *gin.Context) {
 		return
 	}
 
-	hashPassword, err := utils.GenerateHashPassword(existingUser.Password)
+	hashPassword, err := utils.GenerateHashPassword(user.Password)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Не удалось получить хэш пароля"})
 		return
 	}
-	existingUser.Password = string(hashPassword)
+	user.Password = string(hashPassword)
 
-	DB.Create(&existingUser)
+	DB.Create(&user)
 	c.JSON(300, gin.H{"message": "Пользователь успешно зарегистрирован"})
 }
 
