@@ -13,6 +13,7 @@ func main() {
 	usersRouter := router.Group("/users")
 	usersRouter.POST("/login", controllers.LoginHandler)
 	usersRouter.POST("/signup", controllers.SignupHandler)
-	usersRouter.POST("/reset_password", controllers.ResetPasswordHandler)
 	usersRouter.POST("/logout", controllers.LogoutHandler)
+
+	router.Run()
 }

@@ -101,3 +101,8 @@ func SignupHandler(c *gin.Context) {
 	DB.Create(&existingUser)
 	c.JSON(300, gin.H{"message": "Пользователь успешно зарегистрирован"})
 }
+
+func LogoutHandler(c *gin.Context) {
+	c.SetCookie("token", "", -1, "/", "localhost", false, true)
+	c.JSON(200, gin.H{"message": "Пользователь вышел из системы"})
+}

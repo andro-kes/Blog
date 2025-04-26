@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/andro-kes/Blog/models"
@@ -17,6 +18,7 @@ func DBMiddleWare() gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithStatusJSON(400, gin.H{"error": "Файл .env не открывается"})
 		}
+		log.Println(os.Getenv("USER"))
 		dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		os.Getenv("HOST"),
