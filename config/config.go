@@ -27,7 +27,7 @@ func LoadConfig() {
 		os.Getenv("PORT"),
 		os.Getenv("SSLMODE"),
 	)
-	log.Println(DSN)
 
 	SECRET_KEY = os.Getenv("SECRET_KEY")
+	log.Println("Конфигурация установлена")
 }

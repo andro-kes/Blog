@@ -15,6 +15,8 @@ import (
 var DB *gorm.DB 
 
 func init() { 
+	config.LoadConfig()
+	
 	var err error
 	DB, err = gorm.Open(postgres.Open(config.DSN), &gorm.Config{})
 	if err != nil {
