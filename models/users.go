@@ -10,6 +10,7 @@ type Users struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
 	Role string `json:"role"`
+	IsOauth bool `gorm:"default:false"`
 }
 
 type Claims struct {

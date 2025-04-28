@@ -8,8 +8,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var SECRET_KEY string
-var DSN string
+var (
+	SECRET_KEY string
+	DSN string
+	CLIENT_ID string
+	CLIENT_SECRET string
+	REDIRECT_URL string
+)
 
 func LoadConfig() {
 	err := godotenv.Load(".env")
@@ -29,5 +34,10 @@ func LoadConfig() {
 	)
 
 	SECRET_KEY = os.Getenv("SECRET_KEY")
+
+	CLIENT_ID = os.Getenv("CLIENT_ID")
+	CLIENT_SECRET = os.Getenv("CLIENT_SECRET")
+	REDIRECT_URL = os.Getenv("REDIRECT_URL")
+
 	log.Println("Конфигурация установлена")
 }
