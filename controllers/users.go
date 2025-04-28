@@ -12,6 +12,7 @@ import (
 	"github.com/andro-kes/Blog/utils"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/yandex"
 
@@ -64,24 +65,25 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	expititionTime := time.Now().Add(5 * time.Minute)
-	claims := models.Claims{
-		Role: existingUser.Role,
-		StandardClaims: jwt.StandardClaims{
-			Subject: existingUser.Email,
-			ExpiresAt: expititionTime.Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(config.SECRET_KEY))
+	refreshToken, err := utils.GenerateRefreshToken(DB, user.ID)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Не удалось создать токен"})
+		c.JSON(500, gin.H{"error": "Не удалось сгенерировать refresh токен"})
 		return
 	}
 
+	tokenString, err := generateAccessToken(existingUser)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Не удалось сгенерировать access токен"})
+		return
+	}
+	expititionTime := time.Now().Add(5 * time.Minute)
+
+	c.SetCookie("refresh_token", refreshToken, int(time.Now().Add(7 * 24 * time.Hour).Unix()), "/", "localhost", false, true)
 	c.SetCookie("token", tokenString, int(expititionTime.Unix()), "/", "localhost", false, true)
-	c.JSON(200, gin.H{"message": "Пользователь авторизован"})
+	c.JSON(200, gin.H{
+		"message": "Пользователь авторизован",
+		"email": user.Email,
+	})
 }
 
 func SignupHandler(c *gin.Context) {
@@ -121,10 +123,65 @@ func SignupHandler(c *gin.Context) {
 }
 
 func LogoutHandler(c *gin.Context) {
+	/// TODO Отозвать refresh token
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 	c.JSON(200, gin.H{"message": "Пользователь вышел из системы"})
 }
 
+func RefreshTokenHandler(c *gin.Context) {
+	dbValue, ok := c.Get("DB")
+	if ok == false {
+		c.JSON(400, gin.H{"error": "База данных не найдена"})
+		return
+	}
+	DB, ok := dbValue.(*gorm.DB)
+	if ok == false {
+		c.JSON(400, gin.H{"error": "Не удалось подключиться к базе данных"})
+		return
+	}
+
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Refresh токен не найден"})
+		return
+	}
+
+	_, err = c.Cookie("token")
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Токен не найден"})
+		return
+	}
+
+	claims, err := utils.ParseRefreshToken(refreshToken)
+	ok = utils.CompareTokens(DB, claims.TokenID, refreshToken)
+	if ok == false {
+		c.JSON(400, gin.H{"error": "Токены не совпали"})
+		return
+	}
+
+	var user models.Users
+	DB.Where("id = ?", claims.UserID).First(&user)
+	if user.ID == 0 {
+		c.JSON(400, gin.H{"error": "Пользователя не существует"})
+		return
+	}
+
+	refreshToken, err = utils.UpdateRefreshToken(DB, claims.UserID, claims.TokenID)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Не удалось обновить refresh токен"})
+		return
+	}
+
+	tokenString, err := generateAccessToken(user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Не удалось обновить access токен"})
+		return
+	}
+
+	c.SetCookie("refresh_token", refreshToken, int(time.Now().Add(7 * 24 * time.Hour).Unix()), "/", "localhost", false, true)
+	c.SetCookie("token", tokenString, int(time.Now().Add(5 * time.Minute).Unix()), "/", "localhost", false, true)
+	c.JSON(200, gin.H{"message": "Токены обновлены"})
+}
 
 type YandexUser struct {
 	DefaultEmail string `json:"default_email"`
@@ -181,8 +238,6 @@ func LoginYandexHandler(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Информация о пользователе (email): %+v\n", yandexUser)
-
 	var existingUser models.Users
 	dbValue, ok := c.Get("DB")
 	if ok == false {
@@ -199,13 +254,34 @@ func LoginYandexHandler(c *gin.Context) {
 	if existingUser.ID != 0 {
 		log.Println("Вход в систему через Яндекс")
 	} else {
-		DB.Create(&models.Users{
-			Email: yandexUser.DefaultEmail,
-			Role: "user",
-			IsOauth: true,
-		})
+		existingUser.Email = yandexUser.DefaultEmail
+		existingUser.Role = "user"
+		existingUser.IsOauth = true
+		DB.Create(&existingUser)
 	}
-	// TODO вынести в функцию создания токена
+
+	refreshToken, err := utils.GenerateRefreshToken(DB, existingUser.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	
+	tokenString, err := generateAccessToken(existingUser)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Ошибка при создании токена"})
+		return
+	}
+	expititionTime := time.Now().Add(5 * time.Minute)
+
+	c.SetCookie("refresh_token", refreshToken, int(time.Now().Add(7 * 24 * time.Hour).Unix()), "/", "localhost", false, true)
+	c.SetCookie("token", tokenString, int(expititionTime.Unix()), "/", "localhost", false, true)
+	c.JSON(200, gin.H{
+		"message": "Успешная авторизация через Яндекс",
+		"email":   yandexUser.DefaultEmail,
+	})
+}
+
+func generateAccessToken(existingUser models.Users) (string, error) {
 	expititionTime := time.Now().Add(5 * time.Minute)
 	claims := models.Claims{
 		Role: existingUser.Role,
@@ -217,14 +293,6 @@ func LoginYandexHandler(c *gin.Context) {
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := jwtToken.SignedString([]byte(config.SECRET_KEY))
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Не удалось создать токен"})
-		return
-	}
-
-	c.SetCookie("token", tokenString, int(expititionTime.Unix()), "/", "localhost", false, true)
-	c.JSON(200, gin.H{
-		"message": "Успешная авторизация через Яндекс",
-		"email":   yandexUser.DefaultEmail,
-	})
+	return tokenString, err
 }
+

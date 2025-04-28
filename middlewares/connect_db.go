@@ -38,6 +38,10 @@ func init() {
 		log.Fatalf("Ошибка миграции: %v", err)
 		return
 	}
+	if err := DB.AutoMigrate(&models.RefreshTokens{}); err != nil {
+		log.Fatalf("Ошибка миграции: %v", err)
+		return
+	}
 	log.Println("Успешное подключение к базе данных и миграция выполнены")
 }
 

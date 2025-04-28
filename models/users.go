@@ -1,8 +1,9 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"github.com/dgrijalva/jwt-go"
+
+	"gorm.io/gorm"
 )
 
 type Users struct {
