@@ -11,6 +11,7 @@ import (
 var (
 	SECRET_KEY string
 	DSN string
+	TESTDSN string
 	CLIENT_ID string
 	CLIENT_SECRET string
 	REDIRECT_URL string
@@ -29,6 +30,16 @@ func LoadConfig() {
 		"postgres", // TODO: Перенести в .env
 		os.Getenv("PASSWORD"),
 		os.Getenv("DBNAME"),
+		os.Getenv("PORT"),
+		os.Getenv("SSLMODE"),
+	)
+
+	TESTDSN = fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		os.Getenv("HOST"),
+		"postgres", // TODO: Перенести в .env
+		os.Getenv("PASSWORD"),
+		os.Getenv("DBTESTNAME"),
 		os.Getenv("PORT"),
 		os.Getenv("SSLMODE"),
 	)
