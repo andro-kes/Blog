@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/andro-kes/Blog/controllers"
+	"github.com/andro-kes/Blog/controllers/users"
 	"github.com/andro-kes/Blog/middlewares"
 	"github.com/gin-gonic/gin"
 )
