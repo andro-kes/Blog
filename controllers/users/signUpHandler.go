@@ -41,5 +41,5 @@ func SignupHandler(c *gin.Context) {
 	user.Password = string(hashPassword)
 
 	DB.Create(&user)
-	c.JSON(300, gin.H{"message": "Пользователь успешно зарегистрирован"})
+	c.JSON(201, gin.H{"message": "Пользователь успешно зарегистрирован"})
 }

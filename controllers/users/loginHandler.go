@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"time"
 
 	"github.com/andro-kes/Blog/models"
@@ -44,8 +45,8 @@ func LoginHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Неверный пароль"})
 		return
 	}
-
-	refreshToken, err := utils.GenerateRefreshToken(DB, user.ID)
+	log.Printf("\nUserID: %d\n", existingUser.ID)
+	refreshToken, err := utils.GenerateRefreshToken(DB, existingUser.ID)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Не удалось сгенерировать refresh токен"})
 		return

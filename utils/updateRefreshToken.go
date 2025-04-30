@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"log"
+
 	"github.com/andro-kes/Blog/models"
 
 	"github.com/google/uuid"
@@ -10,6 +12,7 @@ import (
 
 func UpdateRefreshToken(DB *gorm.DB, userID uint, tokenID uuid.UUID) (string, error) {
 	var token models.RefreshTokens
-	DB.Delete(&token, tokenID)
+	DB.Delete(&token, userID)
+	log.Println("Удаление рефреш токена")
 	return GenerateRefreshToken(DB, userID)
 }

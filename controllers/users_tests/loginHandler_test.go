@@ -17,6 +17,8 @@ import (
 	"testing"
 
 	"gorm.io/gorm"
+
+	"log"
 )
 
 var DB *gorm.DB
@@ -26,8 +28,13 @@ func SetUpTestRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(middlewares.DBMiddleWare())
 	DB = middlewares.TestDB
+
 	DB.Migrator().DropTable(&models.Users{})
+	DB.Migrator().DropTable(&models.RefreshTokens{})
+
 	DB.Migrator().CreateTable(&models.Users{})
+	DB.Migrator().CreateTable(&models.RefreshTokens{})
+
 	password, _ := bcrypt.GenerateFromPassword([]byte("testpassword"), 16)
 	user := models.Users{
 		Email: "testemail",
@@ -36,6 +43,7 @@ func SetUpTestRouter() *gin.Engine {
 		IsOauth: false,
 	}
 	DB.Create(&user)
+	log.Println(user.ID)
 	return router
 }
 

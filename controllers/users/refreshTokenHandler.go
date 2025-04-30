@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	// "log"
 	"time"
 
 	"github.com/andro-kes/Blog/models"
@@ -21,7 +22,7 @@ func RefreshTokenHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Не удалось подключиться к базе данных"})
 		return
 	}
-
+	
 	refreshToken, err := c.Cookie("refresh_token")
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Refresh токен не найден"})

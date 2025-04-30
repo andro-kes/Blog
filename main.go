@@ -25,6 +25,7 @@ func main() {
 	usersRouter.POST("/login", controllers.LoginHandler)
 	usersRouter.POST("/signup", controllers.SignupHandler)
 	usersRouter.POST("/logout", controllers.LogoutHandler)
+	usersRouter.POST("/refresh_token", controllers.RefreshTokenHandler)
 	usersRouter.GET("/authYandex", controllers.AuthYandexRedirectHandler)
 	usersRouter.GET("/loginYandexHandler", controllers.LoginYandexHandler)
 
