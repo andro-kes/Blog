@@ -1,18 +1,16 @@
 package controllers
 
 import (
+	"github.com/andro-kes/Blog/models"
+	"github.com/andro-kes/Blog/utils"
+
+	"github.com/gin-gonic/gin"
+	
 	"context"
 	"encoding/json"
 	"io"
 	"log"
 	"time"
-
-	"github.com/andro-kes/Blog/models"
-	"github.com/andro-kes/Blog/utils"
-
-	"github.com/gin-gonic/gin"
-
-	"gorm.io/gorm"
 )
 
 type YandexUser struct {
@@ -70,14 +68,8 @@ func LoginYandexHandler(c *gin.Context) {
 	}
 
 	var existingUser models.Users
-	dbValue, ok := c.Get("DB")
-	if ok == false {
-		c.JSON(400, gin.H{"error": "База данных не найдена"})
-		return
-	}
-	DB, ok := dbValue.(*gorm.DB)
-	if ok == false {
-		c.JSON(400, gin.H{"error": "Не удалось подключиться к базе данных"})
+	DB := connect_db(c)
+	if DB == nil {
 		return
 	}
 	
