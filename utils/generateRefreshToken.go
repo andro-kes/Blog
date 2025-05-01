@@ -31,7 +31,6 @@ func GenerateRefreshToken(DB *gorm.DB, userID uint) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
 	tokenString, err := token.SignedString([]byte(config.SECRET_KEY))
-	log.Println(refreshClaims.TokenID)
 	var existingToken models.RefreshTokens
 	DB.Where("user_id = ?", userID).First(&existingToken)
 	if existingToken.Token != "" {

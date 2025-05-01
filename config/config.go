@@ -50,5 +50,5 @@ func LoadConfig() {
 	CLIENT_SECRET = os.Getenv("CLIENT_SECRET")
 	REDIRECT_URL = os.Getenv("REDIRECT_URL")
 
-	log.Println("Конфигурация установлена")
+	log.Println("Конфигурация подгружена")
 }

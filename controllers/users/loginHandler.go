@@ -45,7 +45,6 @@ func LoginHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Неверный пароль"})
 		return
 	}
-	log.Printf("\nUserID: %d\n", existingUser.ID)
 	refreshToken, err := utils.GenerateRefreshToken(DB, existingUser.ID)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Не удалось сгенерировать refresh токен"})
@@ -58,6 +57,8 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	expititionTime := time.Now().Add(5 * time.Minute)
+
+	log.Printf("Пользователь вошел в систему\nid: %d\nemail: %s", existingUser.ID, existingUser.Email)
 
 	c.SetCookie("refresh_token", refreshToken, int(time.Now().Add(7 * 24 * time.Hour).Unix()), "/", "localhost", false, true)
 	c.SetCookie("token", tokenString, int(expititionTime.Unix()), "/", "localhost", false, true)

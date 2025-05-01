@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 
 	"time"
+	"strconv"
 )
 
 func GenerateAccessToken(existingUser models.Users) (string, error) {
@@ -14,7 +15,7 @@ func GenerateAccessToken(existingUser models.Users) (string, error) {
 	claims := models.Claims{
 		Role: existingUser.Role,
 		StandardClaims: jwt.StandardClaims{
-			Subject: existingUser.Email,
+			Subject: strconv.Itoa(int(existingUser.ID)),
 			ExpiresAt: expititionTime.Unix(),
 		},
 	}
