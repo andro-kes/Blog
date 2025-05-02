@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	posts_controllers "github.com/andro-kes/Blog/controllers/posts"
 	"github.com/andro-kes/Blog/controllers/users"
 	"github.com/andro-kes/Blog/middlewares"
 	"github.com/gin-gonic/gin"
@@ -22,12 +23,15 @@ func main() {
 	} ()
 
 	usersRouter := router.Group("/users")
-	usersRouter.POST("/login", controllers.LoginHandler)
-	usersRouter.POST("/signup", controllers.SignupHandler)
-	usersRouter.POST("/logout", controllers.LogoutHandler)
-	usersRouter.POST("/refresh_token", controllers.RefreshTokenHandler)
-	usersRouter.GET("/authYandex", controllers.AuthYandexRedirectHandler)
-	usersRouter.GET("/loginYandexHandler", controllers.LoginYandexHandler)
+	usersRouter.POST("/login", users_controllers.LoginHandler)
+	usersRouter.POST("/signup", users_controllers.SignupHandler)
+	usersRouter.POST("/logout", users_controllers.LogoutHandler)
+	usersRouter.POST("/refresh_token", users_controllers.RefreshTokenHandler)
+	usersRouter.GET("/authYandex", users_controllers.AuthYandexRedirectHandler)
+	usersRouter.GET("/loginYandexHandler", users_controllers.LoginYandexHandler)
+
+	postsRouter := router.Group("/posts")
+	postsRouter.POST("/create", posts_controllers.CreatePostHandler)
 
 	router.Run(":8000")
 }

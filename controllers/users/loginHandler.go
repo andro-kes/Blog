@@ -1,16 +1,17 @@
-package controllers
+package users_controllers
 
 import (
 	"log"
 	"time"
 
 	"github.com/andro-kes/Blog/models"
+	"github.com/andro-kes/Blog/controllers/helpers"
 	"github.com/andro-kes/Blog/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func LoginHandler(c *gin.Context) {
-	DB := connect_db(c)
+	DB := controllers_helpers.Connect_db(c)
 	if DB == nil {
 		return
 	}

@@ -1,4 +1,4 @@
-package controllers_test
+package users_test
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ import (
 
 func TestSignUpHandler(t *testing.T) {
 	router := SetUpTestRouter()
-	router.POST("users/signup", controllers.SignupHandler)
+	router.POST("users/signup", users_controllers.SignupHandler)
 	user := models.Users{
 		Email: "test",
 		Password: "test",

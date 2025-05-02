@@ -1,4 +1,4 @@
-package controllers
+package users_controllers
 
 import (
 	"github.com/andro-kes/Blog/config"

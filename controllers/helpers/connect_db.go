@@ -1,4 +1,4 @@
-package controllers
+package controllers_helpers
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func connect_db(c *gin.Context) *gorm.DB{
+func Connect_db(c *gin.Context) *gorm.DB{
 	dbValue, ok := c.Get("DB")
 	if ok == false {
 		c.JSON(400, gin.H{"error": "База данных не найдена"})

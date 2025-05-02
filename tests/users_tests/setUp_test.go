@@ -1,4 +1,4 @@
-package controllers_test
+package users_test
 
 import (
 	"github.com/andro-kes/Blog/middlewares"
@@ -22,8 +22,10 @@ func SetUpTestRouter() *gin.Engine {
 
 	DB.Migrator().DropTable(&models.Users{})
 	DB.Migrator().DropTable(&models.RefreshTokens{})
+	DB.Migrator().DropTable(&models.RefreshTokens{})
 
 	DB.Migrator().CreateTable(&models.Users{})
+	DB.Migrator().CreateTable(&models.RefreshTokens{})
 	DB.Migrator().CreateTable(&models.RefreshTokens{})
 
 	password, _ := bcrypt.GenerateFromPassword([]byte("testpassword"), 16)

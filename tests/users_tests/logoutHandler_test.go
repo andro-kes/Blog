@@ -1,15 +1,13 @@
-package controllers_test
+package users_test
 
 import (
-	"bytes"
-
+	"github.com/andro-kes/Blog/tests/helpers"
 	"github.com/andro-kes/Blog/controllers/users"
 	"github.com/andro-kes/Blog/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,24 +15,11 @@ import (
 
 func TestLogoutHandler(t *testing.T) {
 	router := SetUpTestRouter()
-	router.POST("users/login", controllers.LoginHandler)
+	cookies := test_helpers.Login(router)
+
+	router.POST("users/logout", users_controllers.LogoutHandler)
 	w := httptest.NewRecorder()
-	user := models.Users{
-		Email: "testemail",
-		Password: "testpassword",
-	}
-	jsonUser, err := json.Marshal(user)
-	assert.NoError(t, err)
-	req, err := http.NewRequest("POST", "/users/login", bytes.NewBuffer(jsonUser))
-	assert.NoError(t, err)
-	router.ServeHTTP(w, req)
-	assert.Equal(t, 200, w.Code)
-
-	cookies := w.Result().Cookies()
-
-	router.POST("users/logout", controllers.LogoutHandler)
-	w = httptest.NewRecorder()
-	req, err = http.NewRequest("POST", "/users/logout", nil)
+	req, err := http.NewRequest("POST", "/users/logout", nil)
 	assert.NoError(t, err)
 
 	for _, cookie := range cookies {

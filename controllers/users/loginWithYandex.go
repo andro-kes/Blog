@@ -1,8 +1,9 @@
-package controllers
+package users_controllers
 
 import (
 	"github.com/andro-kes/Blog/models"
 	"github.com/andro-kes/Blog/utils"
+	"github.com/andro-kes/Blog/controllers/helpers"
 
 	"github.com/gin-gonic/gin"
 	
@@ -68,7 +69,7 @@ func LoginYandexHandler(c *gin.Context) {
 	}
 
 	var existingUser models.Users
-	DB := connect_db(c)
+	DB := controllers_helpers.Connect_db(c)
 	if DB == nil {
 		return
 	}
