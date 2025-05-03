@@ -31,8 +31,10 @@ func main() {
 	usersRouter.GET("/loginYandexHandler", users_controllers.LoginYandexHandler)
 
 	postsRouter := router.Group("/posts")
+	postsRouter.Use(middlewares.IsAuthorized())
 	postsRouter.POST("/create", posts_controllers.CreatePostHandler)
 	postsRouter.GET("/:id", posts_controllers.RetrievePostHandler)
+	router.GET("/all", posts_controllers.GetAllPostsHandler)
 
 	router.Run(":8000")
 }
