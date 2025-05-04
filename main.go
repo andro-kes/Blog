@@ -35,6 +35,7 @@ func main() {
 	postsRouter.POST("/create", posts_controllers.CreatePostHandler)
 	postsRouter.GET("/:id", posts_controllers.RetrievePostHandler)
 	router.GET("/all", posts_controllers.GetAllPostsHandler)
+	router.GET("/all/:id", posts_controllers.GetUserPostsHandler)
 
 	router.Run(":8000")
 }
