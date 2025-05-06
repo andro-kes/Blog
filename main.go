@@ -36,6 +36,7 @@ func main() {
 	postsRouter.GET("/:id", posts_controllers.RetrievePostHandler)
 	router.GET("/all", posts_controllers.GetAllPostsHandler)
 	router.GET("/all/:id", posts_controllers.GetUserPostsHandler)
+	router.PATCH("/update/:id", posts_controllers.UpdatePostHandler)
 
 	router.Run(":8000")
 }
